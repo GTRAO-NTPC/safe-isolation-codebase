@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equipment Access</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#1a2330;--mut:#5d6b7a;--line:#dde3ea;--ok:#0a7d3c;--okbg:#e6f6ec;--no:#b3261e;--nobg:#fdeceb;--acc:#1f5fbf}
+@media (prefers-color-scheme:dark){:root{--bg:#10151b;--card:#1a212a;--ink:#e8edf2;--mut:#93a1b0;--line:#2b3541;--ok:#4cc97f;--okbg:#12301f;--no:#ff8a80;--nobg:#3a1a18;--acc:#6ea8ff}}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);display:flex;justify-content:center;padding:16px}
+main{width:100%;max-width:440px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-top:12px}
+h1{font-size:1.1rem;margin:0 0 4px}
+.sub{color:var(--mut);font-size:.9rem;margin:0 0 16px}
+label{display:block;font-size:.85rem;color:var(--mut);margin-bottom:6px}
+input{width:100%;padding:12px;font-size:1rem;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);letter-spacing:.3em;text-align:center;font-size:1.4rem}
+input:focus{outline:2px solid var(--acc);border-color:transparent}
+button{width:100%;margin-top:12px;padding:12px;font-size:1rem;font-weight:600;border:0;border-radius:8px;background:var(--acc);color:#fff;cursor:pointer}
+.banner{border-radius:10px;padding:14px;font-weight:700;font-size:1.15rem;text-align:center;margin-bottom:16px}
+.ok{background:var(--okbg);color:var(--ok)}.no{background:var(--nobg);color:var(--no)}
+dl{margin:0}dt{font-size:.78rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;margin-top:12px}
+dd{margin:2px 0 0;font-weight:500;word-break:break-word}
+.link{background:none;color:var(--acc);margin-top:8px;font-weight:500}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+  <div id="entry" class="card">
+    <h1>Equipment Access</h1>
+    <p class="sub" id="eqno"></p>
+    <label for="code">Enter the 4-digit unique code</label>
+    <input id="code" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" spellcheck="false" placeholder="4-digit code">
+    <button id="go">Verify</button>
+  </div>
+
+  <div id="result" class="card hide">
+    <div id="banner" class="banner"></div>
+    <dl id="details"></dl>
+    <button class="link" id="again">Try again</button>
+  </div>
+
+  <div id="bad" class="card hide">
+    <div class="banner no">Invalid QR code</div>
+    <p class="sub">This equipment was not found. Please rescan the QR code on the equipment.</p>
+  </div>
+</main>
+
+<script>
+const DATA = /*DATA*/;
+const $ = id => document.getElementById(id);
+const norm = s => (s||"").trim();
+const id = new URLSearchParams(location.search).get("e");
+const rec = id && DATA[id.trim()];
+
+if (!rec) { $("entry").classList.add("hide"); $("bad").classList.remove("hide"); }
+else { $("eqno").textContent = "Equipment " + id.trim(); $("code").focus(); }
+
+function row(k, v){ return v ? "<dt>"+k+"</dt><dd>"+v.replace(/</g,"&lt;")+"</dd>" : ""; }
+function show(granted){
+  $("entry").classList.add("hide"); $("result").classList.remove("hide");
+  const b = $("banner");
+  b.textContent = granted ? "ACCESS GRANTED" : "ACCESS DENIED";
+  b.className = "banner " + (granted ? "ok" : "no");
+  $("details").innerHTML =
+    (granted ? "" : '<dt style="margin-top:0">Correct details for this equipment</dt>') +
+    row("Equipment", id.trim()) + row("Functional Location", rec.fl) +
+    row("Description", rec.d) + row("Work Center", rec.wc) +
+    row("Planner Group", rec.pg) + row("Plant", rec.pl) +
+    row("ABC Indicator", rec.abc) + row("System Status", rec.st) +
+    row("Created On", rec.cr) + row("Changed On", rec.ch);
+  $("again").classList.toggle("hide", granted);
+}
+function verify(){ show(norm($("code").value) === norm(rec.c)); }
+$("go").onclick = verify;
+$("code").onkeydown = e => { if (e.key === "Enter") verify(); };
+$("again").onclick = () => { $("result").classList.add("hide"); $("entry").classList.remove("hide"); $("code").value=""; $("code").focus(); };
+</script>
+</body>
+</html>
