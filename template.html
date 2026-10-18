@@ -66,10 +66,7 @@ function show(granted){
   $("details").innerHTML =
     (granted ? "" : '<dt style="margin-top:0">Correct details for this equipment</dt>') +
     row("Equipment", id.trim()) + row("Functional Location", rec.fl) +
-    row("Description", rec.d) + row("Work Center", rec.wc) +
-    row("Planner Group", rec.pg) + row("Plant", rec.pl) +
-    row("ABC Indicator", rec.abc) + row("System Status", rec.st) +
-    row("Created On", rec.cr) + row("Changed On", rec.ch);
+    row("Description", rec.d) + row("Plant", rec.pl);
   $("again").classList.toggle("hide", granted);
 }
 function verify(){ show(norm($("code").value) === norm(rec.c)); }

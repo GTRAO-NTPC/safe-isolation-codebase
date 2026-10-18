@@ -28,10 +28,8 @@ out.to_csv("codes.csv", index=False)
 date = lambda s: s[:10]
 data = {r["Equipment"]: {
     "c": codes[r["Equipment"]],
-    "fl": r["Functional Location"].strip(), "d": r["Object Description"].strip(),
-    "wc": r["Main Work Center"], "pg": r["Maint. Planner Group"], "pl": r["Planning Plant"],
-    "abc": r["ABC Indicator"], "st": r["System status"],
-    "cr": date(r["Created On"]), "ch": date(r["Changed On"])}
+    "fl": r["Functional Location"].strip(), "d": r["Object Description"].strip(), "pl": r["Planning Plant"],
+    }
     for _, r in df.iterrows()}
 html = open("template.html", encoding="utf-8").read().replace(
     "/*DATA*/", json.dumps(data, separators=(",", ":"), ensure_ascii=False))
